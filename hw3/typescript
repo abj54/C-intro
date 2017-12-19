@@ -1,0 +1,699 @@
+Script started on Tue 07 Mar 2017 12:52:15 PM EST
+janwesh@vm71:~/cs240/hw3$ ls -l
+total 49
+lrwxrwxrwx 1 janwesh cs240-1G    36 Feb 19 00:18 cs240_hw3 -> /courses/cs240/s17/xiaohui/GROUP/hw3
+-rw-r--r-- 1 janwesh cs240-1G 35840 Feb 21 13:36 hw3.doc
+-rwxr-xr-x 1 janwesh cs240-1G  9122 Mar  7 12:49 showxbits
+-rw-r--r-- 1 janwesh cs240-1G   857 Mar  6 22:38 showxbits.c
+-rw-r--r-- 1 janwesh cs240-1G     0 Mar  7 12:52 typescript
+-rw-r--r-- 1 janwesh cs240-1G  1868 Mar  6 22:40 xbits.c
+-rw-r--r-- 1 janwesh cs240-1G   763 Feb 21 13:36 xbits.h
+janwesh@vm71:~/cs240/hw3$ cat xbits.c
+/*
+ xbits.c - hw3
+ Name: Anwesh Joshi
+ Date: 03/06/2017
+*/
+
+/*
+ *  stubs for functions to study
+ *  integer-hex conversions
+ *
+ */
+
+/*
+ PseudoCode:
+   	For itox:
+		do
+			store the remainder after dividing n by 16
+			change the remainder to character value using different if-statements
+			store that value to the array hexstring
+		repeat if n/16 is not 0
+		make the last character in array as terminating 0 i.e.'\0'
+  		Reverse the hexstring
+		print the integer and the hexstring array
+	
+	  
+
+	
+	For xtoi:
+		for all characters in hexstring until \0 is obtained
+			change the character value to int value 'r' for valid characters or else break the loop
+			change it to integer value by multiplying the result (0 at starting point) by 16 and adding the int value 'r'
+		print the hexstring array and the result
+		return the result		   
+	
+*/
+
+#include <stdio.h>
+#include "xbits.h"
+
+/* function represents the int n as a hexstring which it places in the
+hexstring array */
+
+void itox( char hexstring[], int n) {
+	printf("in itox, processing %d\n",n);
+	int r,p,q,m,z;
+	char k;
+	z = 2*(sizeof(int))+1;
+	m=0;
+	do {
+		r = n%16;
+		if (r >= 10 && r <=15)
+			k='A' +r -10;
+		else
+			k= r+'0';
+		hexstring[m++]=k;
+	} while ((n/=16)!=0);
+	for (p=m;p<z-1;++p) {
+		hexstring[p]='0';
+	}
+	hexstring[z-1]='\0';
+	for (q=0;q<(z-1)/2;++q) {
+		k=hexstring[q] ;
+		hexstring[q]=hexstring[z-q-2];
+		hexstring[z-q-2]=k;			
+   	}
+}
+
+/* function converts hexstring array to equivalent integer value  */
+
+int xtoi( char hexstring[]) {
+	printf("in xtoi, processing %s\n",hexstring);
+	int m,a,r;
+	char k;	
+	a = 0;		
+	for (m=0;hexstring[m]!='\0';++m) {
+		k=hexstring[m];			
+		if (k >= 'A' && k <= 'F' )
+			r= k - 'A' +10;  
+		else if (k>='0' && k<='9')
+			r=k-'0';
+		else
+			break;
+		a = 16*a +r;
+	}
+	return a;
+}
+
+janwesh@vm71:~/cs240/hw3$ cat showxbits.c
+/* 
+  showxbits.c - Homework 3
+  Name: Anwesh Joshi
+  Date: 03/06/2017
+*/ 
+
+
+
+/*
+ *  stub driver for functions to study integer-hex conversions
+ *
+ */
+
+/* PseudoCode:
+	Create an array hexstring with size 2*sizeof(int)+1
+	while the input is not EOF or non-integer
+		use itox to store hexadecimal strings for n in hexstring
+		use xtoi to convert that hexstring back to integer
+		print the input integer in hexadecimal using /X, the hexstring array and the integer value that we got from xtoi
+*/     
+
+#include <stdio.h>
+#include "xbits.h"
+#define SPACE 2*(sizeof(int))+1
+
+int main() {
+  int n;
+  int m = 0;
+  char hexstring[SPACE];
+  while (scanf("%d",&n)==1) {
+	itox( hexstring, n); 
+	m= xtoi(hexstring);
+	printf("input number  = %d and hexstring = %s and back to integer = %d\n", n,hexstring, m);
+  }
+  return 0;  
+}
+
+
+janwesh@vm71:~/cs240/hw3$ gcc -m32 xbits.c showxbits.c -o showxbits
+janwesh@vm71:~/cs240/hw3$ ./showxbits
+123
+in itox, processing 123
+in xtoi, processing 0000007B
+input number  = 123 and hexstring = 0000007B and back to integer = 123
+321
+in itox, processing 321
+in xtoi, processing 00000141
+input number  = 321 and hexstring = 00000141 and back to integer = 321
+170
+in itox, processing 170
+in xtoi, processing 000000AA
+input number  = 170 and hexstring = 000000AA and back to integer = 170
+janwesh@vm71:~/cs240/hw3$ gcc -m32 xbits.c showxbits.c -o showxbits -g
+janwesh@vm71:~/cs240/hw3$ gdb ./showxbits
+GNU gdb (Ubuntu 7.7.1-0ubuntu5~14.04.2) 7.7.1
+Copyright (C) 2014 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./showxbits...done.
+(gdb) b main
+Breakpoint 1 at 0x8048670: file showxbits.c, line 26.
+(gdb) l
+17			use itox to store hexadecimal strings for n in hexstring
+18			use xtoi to convert that hexstring back to integer
+19			print the input integer in hexadecimal using /X, the hexstring array and the integer value that we got from xtoi
+20	*/     
+21	
+22	#include <stdio.h>
+23	#include "xbits.h"
+24	#define SPACE 2*(sizeof(int))+1
+25	
+26	int main() {
+(gdb) l
+27	  int n;
+28	  int m = 0;
+29	  char hexstring[SPACE];
+30	  while (scanf("%d",&n)==1) {
+31		itox( hexstring, n); 
+32		m= xtoi(hexstring);
+33		printf("input number  = %d and hexstring = %s and back to integer = %d\n", n,hexstring, m);
+34	  }
+35	  return 0;  
+36	}
+(gdb) s
+The program is not being run.
+(gdb) r
+Starting program: /courses/cs240/s17/xiaohui/janwesh/hw3/showxbits 
+
+Breakpoint 1, main () at showxbits.c:26
+26	int main() {
+(gdb) s
+28	  int m = 0;
+(gdb) s
+30	  while (scanf("%d",&n)==1) {
+(gdb) s
+123
+31		itox( hexstring, n); 
+(gdb) s
+itox (hexstring=0xffffdc13 <incomplete sequence \367>, n=123) at xbits.c:44
+44		printf("in itox, processing %d\n",n);
+(gdb) s
+in itox, processing 123
+47		z = 2*(sizeof(int))+1;
+(gdb) s
+48		m=0;
+(gdb) s
+50			r = n%16;
+(gdb) s
+51			if (r >= 10 && r <=15)
+(gdb) s
+52				k='A' +r -10;
+(gdb) s
+55			hexstring[m++]=k;
+(gdb) s
+56		} while ((n/=16)!=0);
+(gdb) s
+50			r = n%16;
+(gdb) s
+51			if (r >= 10 && r <=15)
+(gdb) s
+54				k= r+'0';
+(gdb) b [Kt
+#0  itox (hexstring=0xffffdc13 "B", n=7) at xbits.c:54
+#1  0x0804869a in main () at showxbits.c:31
+(gdb) s
+55			hexstring[m++]=k;
+(gdb) s
+56		} while ((n/=16)!=0);
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) p r
+$1 = 7
+(gdb) p n
+$2 = 0
+(gdb) s
+58			hexstring[p]='0';
+(gdb) bt
+#0  itox (hexstring=0xffffdc13 "B7\320\377\367\v\207\004\b", n=0) at xbits.c:58
+#1  0x0804869a in main () at showxbits.c:31
+(gdb) help
+List of classes of commands:
+
+aliases -- Aliases of other commands
+breakpoints -- Making program stop at certain points
+data -- Examining data
+files -- Specifying and examining files
+internals -- Maintenance commands
+obscure -- Obscure features
+running -- Running the program
+stack -- Examining the stack
+status -- Status inquiries
+support -- Support facilities
+tracepoints -- Tracing of program execution without stopping the program
+user-defined -- User-defined commands
+
+Type "help" followed by a class name for a list of commands in that class.
+Type "help all" for the list of all commands.
+Type "help" followed by command name for full documentation.
+Type "apropos word" to search for commands related to "word".
+Command name abbreviations are allowed if unambiguous.
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+58			hexstring[p]='0';
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+58			hexstring[p]='0';
+(gdb) p hexstring
+$3 = 0xffffdc13 "B700\367\v\207\004\b"
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+58			hexstring[p]='0';
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+58			hexstring[p]='0';
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+58			hexstring[p]='0';
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+60		hexstring[z-1]='\0';
+(gdb) s
+61		for (q=0;q<(z-1)/2;++q) {
+(gdb) s
+62			k=hexstring[q] ;
+(gdb) s
+63			hexstring[q]=hexstring[z-q-2];
+(gdb) s
+64			hexstring[z-q-2]=k;			
+(gdb) s
+61		for (q=0;q<(z-1)/2;++q) {
+(gdb) s
+62			k=hexstring[q] ;
+(gdb) s
+63			hexstring[q]=hexstring[z-q-2];
+(gdb) s
+64			hexstring[z-q-2]=k;			
+(gdb) s
+61		for (q=0;q<(z-1)/2;++q) {
+(gdb) s
+62			k=hexstring[q] ;
+(gdb) s
+63			hexstring[q]=hexstring[z-q-2];
+(gdb) s
+64			hexstring[z-q-2]=k;			
+(gdb) s
+61		for (q=0;q<(z-1)/2;++q) {
+(gdb) s
+62			k=hexstring[q] ;
+(gdb) s
+63			hexstring[q]=hexstring[z-q-2];
+(gdb) s
+64			hexstring[z-q-2]=k;			
+(gdb) s
+61		for (q=0;q<(z-1)/2;++q) {
+(gdb) s
+66	}
+(gdb) s
+main () at showxbits.c:32
+32		m= xtoi(hexstring);
+(gdb) s
+xtoi (hexstring=0xffffdc13 "0000007B") at xbits.c:71
+71		printf("in xtoi, processing %s\n",hexstring);
+(gdb) s
+in xtoi, processing 0000007B
+74		a = 0;		
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) p a
+$4 = 0
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) p k
+$5 = 48 '0'
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) p k
+$6 = 48 '0'
+(gdb) s
+80				r=k-'0';
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) p r
+$7 = 0
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) bt
+#0  xtoi (hexstring=0xffffdc13 "0000007B") at xbits.c:80
+#1  0x080486a6 in main () at showxbits.c:32
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) s
+78				r= k - 'A' +10;  
+(gdb) p a
+$8 = 7
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+85		return a;
+(gdb) s
+86	}
+(gdb) s
+main () at showxbits.c:33
+33		printf("input number  = %d and hexstring = %s and back to integer = %d\n", n,hexstring, m);
+(gdb) s
+input number  = 123 and hexstring = 0000007B and back to integer = 123
+30	  while (scanf("%d",&n)==1) {
+(gdb) s
+170
+31		itox( hexstring, n); 
+(gdb) n
+in itox, processing 170
+32		m= xtoi(hexstring);
+(gdb) n
+in xtoi, processing 000000AA
+33		printf("input number  = %d and hexstring = %s and back to integer = %d\n", n,hexstring, m);
+(gdb) n
+input number  = 170 and hexstring = 000000AA and back to integer = 170
+30	  while (scanf("%d",&n)==1) {
+(gdb) s
+15
+31		itox( hexstring, n); 
+(gdb) s
+itox (hexstring=0xffffdc13 "000000AA", n=15) at xbits.c:44
+44		printf("in itox, processing %d\n",n);
+(gdb) s
+in itox, processing 15
+47		z = 2*(sizeof(int))+1;
+(gdb) s
+48		m=0;
+(gdb) s
+50			r = n%16;
+(gdb) s
+51			if (r >= 10 && r <=15)
+(gdb) s
+52				k='A' +r -10;
+(gdb) s
+55			hexstring[m++]=k;
+(gdb) s
+56		} while ((n/=16)!=0);
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+58			hexstring[p]='0';
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+58			hexstring[p]='0';
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+58			hexstring[p]='0';
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+58			hexstring[p]='0';
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+58			hexstring[p]='0';
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+58			hexstring[p]='0';
+(gdb) p hexstring
+$9 = 0xffffdc13 "F00000AA"
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+58			hexstring[p]='0';
+(gdb) s
+57		for (p=m;p<z-1;++p) {
+(gdb) s
+60		hexstring[z-1]='\0';
+(gdb) s
+61		for (q=0;q<(z-1)/2;++q) {
+(gdb) s
+62			k=hexstring[q] ;
+(gdb) s
+63			hexstring[q]=hexstring[z-q-2];
+(gdb) s
+64			hexstring[z-q-2]=k;			
+(gdb) s
+61		for (q=0;q<(z-1)/2;++q) {
+(gdb) s
+62			k=hexstring[q] ;
+(gdb) s
+63			hexstring[q]=hexstring[z-q-2];
+(gdb) s
+64			hexstring[z-q-2]=k;			
+(gdb) s
+61		for (q=0;q<(z-1)/2;++q) {
+(gdb) s
+62			k=hexstring[q] ;
+(gdb) s
+63			hexstring[q]=hexstring[z-q-2];
+(gdb) s
+64			hexstring[z-q-2]=k;			
+(gdb) s
+61		for (q=0;q<(z-1)/2;++q) {
+(gdb) s
+62			k=hexstring[q] ;
+(gdb) s
+63			hexstring[q]=hexstring[z-q-2];
+(gdb) s
+64			hexstring[z-q-2]=k;			
+(gdb) s
+61		for (q=0;q<(z-1)/2;++q) {
+(gdb) s
+66	}
+(gdb) s
+main () at showxbits.c:32
+32		m= xtoi(hexstring);
+(gdb) s
+xtoi (hexstring=0xffffdc13 "0000000F") at xbits.c:71
+71		printf("in xtoi, processing %s\n",hexstring);
+(gdb) s
+in xtoi, processing 0000000F
+74		a = 0;		
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) p a
+$10 = 0
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) s
+83			a = 16*a +r;
+(gdb) p m
+$11 = 0
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) p a
+$12 = 0
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) p r
+$13 = 0
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) p a
+$14 = 0
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) s
+79			else if (k>='0' && k<='9')
+(gdb) s
+80				r=k-'0';
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+76			k=hexstring[m];			
+(gdb) s
+77			if (k >= 'A' && k <= 'F' )
+(gdb) s
+78				r= k - 'A' +10;  
+(gdb) s
+83			a = 16*a +r;
+(gdb) s
+75		for (m=0;hexstring[m]!='\0';++m) {
+(gdb) s
+85		return a;
+(gdb) s
+86	}
+(gdb) p a
+$15 = 15
+(gdb) s
+main () at showxbits.c:33
+33		printf("input number  = %d and hexstring = %s and back to integer = %d\n", n,hexstring, m);
+(gdb) s
+input number  = 15 and hexstring = 0000000F and back to integer = 15
+30	  while (scanf("%d",&n)==1) {
+(gdb) q
+A debugging session is active.
+
+	Inferior 1 [process 5896] will be killed.
+
+Quit anyway? (y or n) y
+janwesh@vm71:~/cs240/hw3$ exit
+exit
+
+Script done on Tue 07 Mar 2017 12:56:15 PM EST

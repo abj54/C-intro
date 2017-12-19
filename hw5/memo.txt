@@ -1,0 +1,25 @@
+
+Name: Anwesh Joshi
+Date: 04/10/2017
+memo.txt - Homework 5
+
+explore.c:
+The local automatic variable d is stored in a stack and so it has a
+different memory address compared to a,b and c which are external and
+static variables as static and external variables are stored in BSS.
+In the run, we can see local variable's address beginning with ff 
+while all other variables have address beginning with 80. 
+
+Similarly, when priniting the address of array from 0 to 6, we see the
+value of external and static variables being printed again. Also, when 
+we check the memory location, it is quite visible that since array is made
+of int, each index increaes by 4 bytes.
+
+Now, when we enter foobar.c, at many points we can see the same value being 
+repeated. We also see the value of d and a being printed as well.
+But it also prints the value of ap and dp as well. This is because of the way
+foobar has been called by passing these values as paraeters.
+
+
+At the end it is quite clear that main() is passed into the stack followed by
+the foobar() making it possible for us to access the local variables.

@@ -1,0 +1,128 @@
+Script started on Wed 22 Mar 2017 03:46:37 PM EDT
+janwesh@vm71:~/cs240/hw4$ ls -l
+total 69
+-rw-r--r-- 1 janwesh cs240-1G   159 Mar 22 15:42 calc.h
+-rw-r--r-- 1 janwesh cs240-1G    34 Mar 22 14:33 calc.in
+-rwxr-xr-x 1 janwesh cs240-1G  7802 Mar 22 15:46 calcit
+lrwxrwxrwx 1 janwesh cs240-1G    36 Mar  7 21:51 cs240_hw4 -> /courses/cs240/s17/xiaohui/GROUP/hw4
+-rw-r--r-- 1 janwesh cs240-1G   643 Mar 22 14:21 getch.c
+-rw-r--r-- 1 janwesh cs240-1G  1340 Mar 22 15:46 getch.o
+-rw-r--r-- 1 janwesh cs240-1G   881 Mar 22 15:45 getop.c
+-rw-r--r-- 1 janwesh cs240-1G  1364 Mar 22 15:46 getop.o
+-rw-r--r-- 1 janwesh cs240-1G 34816 Mar 12 18:18 hw4.doc
+-rw-r--r-- 1 janwesh cs240-1G  1187 Mar 22 15:19 main.c
+-rw-r--r-- 1 janwesh cs240-1G  2048 Mar 22 15:46 main.o
+-rw-r--r-- 1 janwesh cs240-1G  1440 Mar 22 15:22 makefile
+-rw-r--r-- 1 janwesh cs240-1G  1294 Mar 22 15:33 makefile2
+-rw-r--r-- 1 janwesh cs240-1G   832 Mar 22 14:21 stack.c
+-rw-r--r-- 1 janwesh cs240-1G  1396 Mar 22 15:46 stack.o
+-rw-r--r-- 1 janwesh cs240-1G  7077 Mar 22 15:22 typescript1
+-rw-r--r-- 1 janwesh cs240-1G     0 Mar 22 15:46 typescript2
+janwesh@vm71:~/cs240/hw4$ cat makefile2
+
+#  Name :Anwesh Joshi
+#  makefile2 - HW4
+#  03/22/2017
+
+
+
+
+
+# makefile for hw4
+# format of entries;
+
+# < target list >:  	< dependency list >
+# 			< command list >
+
+# make will look at the last-write dates of each file, and if the target
+# file hasn't been updated since the source files were last modified,
+# it will update the target file by executing the shell command. Note that
+# the spacing to the < dependency list > and < command list > MUST be done
+# with tabs, not spaces.
+#
+# now here is a Macro as defined in Glass Unix.
+
+cc =	gcc
+CFLAGS =   -m32 
+
+calcit:	main.o getop.o stack.o getch.o
+		$(cc) $(CFLAGS) -g -o calcit main.o getop.o stack.o getch.o
+
+# note that if calc.h changes, main.c and getop.c must be recompiled
+
+
+main.o:	        main.c calc.h	
+getop.o:	getop.c calc.h		
+stack.o:	stack.c 	
+getch.o: 	getch.c 	
+  
+# this tells make what to make if you just type 'make'; if this isn't there,
+# the first rule in the file will be the default.
+
+# default:	calcit
+
+# here is a rule to clean up the directory when calcit is final and you want
+# to reduce the clutter in the listing. Note that clean doesn't need to
+# depend on any file modification time, so the < dependency list > position is
+# just left empty.
+
+clean:
+		rm *.o
+janwesh@vm71:~/cs240/hw4$ make clean -f makefile2
+rm *.o
+janwesh@vm71:~/cs240/hw4$ make -f makefile2
+cc -m32    -c -o main.o main.c
+cc -m32    -c -o getop.o getop.c
+cc -m32    -c -o stack.o stack.c
+cc -m32    -c -o getch.o getch.c
+gcc -m32  -g -o calcit main.o getop.o stack.o getch.o
+janwesh@vm71:~/cs240/hw4$ vi getop.c
+[?1049h[?1h=[2;1H▽[6n[1;1H  [1;1H[1;26r[?12;25h[?12l[?25h[27m[m[H[2J[?25l[26;1H"getop.c" 55L, 881C[>c[1;1H[38;5;130m  1 [m[34m/*[m
+[38;5;130m  2 [m[34m [m
+[38;5;130m  3 [m[34m getop.c - HW4[m
+[38;5;130m  4 [m[34m 03/22/2017[m
+[38;5;130m  5 [m[34m*/[m
+[38;5;130m  6 
+  7 [m[34m/* [m
+[38;5;130m  8 [m[34m * getop.c[m
+[38;5;130m  9 [m[34m *[m
+[38;5;130m 10 [m[34m * gets next token: operator or numeric operand[m
+[38;5;130m 11 [m[34m                  : if it's a negative sign, make sure to check for  it as nn[m[12;1H[38;5;130m    [m[34megative number of '-' operation[m
+[38;5;130m 12 [m[34m */[m
+[38;5;130m 13 
+ 14 [m[35m#include [m[31m<stdio.h>[m
+[38;5;130m 15 [m[35m#include [m[31m<ctype.h>[m
+[38;5;130m 16 [m[35m#include [m[31m"calc.h"[m
+[38;5;130m 17 
+ 18 [m[32mint[m getop([32mchar[m s[])
+[38;5;130m 19 [m{
+[38;5;130m 20 [m    [32mint[m i, c;
+[38;5;130m 21 
+ 22 [m    [38;5;130mwhile[m ((s[[31m0[m] = c = getch()) == [31m' '[m || c == [35m'\t'[m)
+[38;5;130m 23 [m[8C;
+[38;5;130m 24 [m[26;63H1,1[11CTop[1;5H[?12l[?25h[?25l[26;63H2[2;5H[?12l[?25h[?25l[26;63H3[3;5H[?12l[?25h[?25l[26;63H2[2;5H[?12l[?25h[?25l[26;63H3[3;5H[?12l[?25h[?25l[26;63H2[2;5H[?12l[?25h[?25l[26;1H[1m-- INSERT --[m[26;13H[K[26;63H2,1[11CTop[2;5H[?12l[?25h[?25l[1C[34m [m[26;65H2[2;6H[?12l[?25h[?25l[34mN [m[26;65H3[2;7H[?12l[?25h[?25l[34ma [m[26;65H4[2;8H[?12l[?25h[?25l[34mm [m[26;65H5[2;9H[?12l[?25h[?25l[34me [m[26;65H6[2;10H[?12l[?25h[?25l[34m: [m[26;65H7[2;11H[?12l[?25h[?25l[1C[34m [m[26;65H8[2;12H[?12l[?25h[?25l[34mA [m[26;65H9[2;13H[?12l[?25h[?25l[34mn [m[26;65H10[2;14H[?12l[?25h[?25l[34mw [m[26;66H1[2;15H[?12l[?25h[?25l[34me [m[26;66H2[2;16H[?12l[?25h[?25l[34ms [m[26;66H3[2;17H[?12l[?25h[?25l[34mh [m[26;66H4[2;18H[?12l[?25h[?25l[1C[34m [m[26;66H5[2;19H[?12l[?25h[?25l[34mJ [m[26;66H6[2;20H[?12l[?25h[?25l[34mo [m[26;66H7[2;21H[?12l[?25h[?25l[34ms [m[26;66H8[2;22H[?12l[?25h[?25l[34mh [m[26;66H9[2;23H[?12l[?25h[?25l[34mi [m[26;65H20[2;24H[?12l[?25h[26;1H[K[2;23H[?25l[26;63H2,19[10CTop[2;23H[?12l[?25h[?25l[26;63H[K[26;1H:[?12l[?25hw[?25l[?12l[?25hq[?25l[?12l[?25h[?25l"getop.c" 55L, 900C written
+[?1l>[?12l[?25h[?1049ljanwesh@vm71:~/cs240/hw4$ make -f makefile2
+cc -m32    -c -o getop.o getop.c
+gcc -m32  -g -o calcit main.o getop.o stack.o getch.o
+janwesh@vm71:~/cs240/hw4$ touch calc.h
+janwesh@vm71:~/cs240/hw4$ make -f makefile2
+cc -m32    -c -o main.o main.c
+cc -m32    -c -o getop.o getop.c
+gcc -m32  -g -o calcit main.o getop.o stack.o getch.o
+janwesh@vm71:~/cs240/hw4$ diff -w makefile makefile2
+3c3
+< #  makefile - HW4
+---
+> #  makefile2 - HW4
+34d33
+< 		$(cc) $(CFLAGS) -c -o main.o main.c
+36d34
+< 		$(cc) $(CFLAGS) -c -o getop.o getop.c
+38d35
+< 		$(cc) $(CFLAGS) -c -o stack.o stack.c
+40d36
+< 		$(cc) $(CFLAGS) -c -o getch.o getch.c
+janwesh@vm71:~/cs240/hw4$ exit
+exit
+
+Script done on Wed 22 Mar 2017 03:48:25 PM EDT

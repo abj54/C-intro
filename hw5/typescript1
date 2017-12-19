@@ -1,0 +1,182 @@
+Script started on Tue 11 Apr 2017 01:09:59 PM EDT
+janwesh@vm71:~/cs240/hw5$ ls -l
+total 91
+-rwxr-xr-x 1 janwesh cs240-1G  7434 Apr  4 23:53 explore
+-rw-r--r-- 1 janwesh cs240-1G  1509 Apr  4 23:55 explore.c
+lrwxrwxrwx 1 janwesh cs240-1G    36 Mar 23 11:05 hw5 -> /courses/cs240/s17/xiaohui/GROUP/hw5
+-rw-r--r-- 1 janwesh cs240-1G 37376 Mar 23 11:05 hw5.doc
+-rw-r--r-- 1 janwesh cs240-1G  2033 Apr  7 17:09 lineholder.c
+-rw-r--r-- 1 janwesh cs240-1G   611 Apr  7 17:05 lineholder.h
+-rw-r--r-- 1 janwesh cs240-1G  3912 Apr 11 13:01 lineholder.o
+-rw-r--r-- 1 janwesh cs240-1G   336 Apr  4 22:31 makefile
+-rw-r--r-- 1 janwesh cs240-1G  1096 Apr  4 23:51 memo.txt
+-rw-r--r-- 1 janwesh cs240-1G  1060 Mar 23 11:05 sample_typescript.txt
+-rwxr-xr-x 1 janwesh cs240-1G  9833 Apr 11 13:01 tail
+-rw-r--r-- 1 janwesh cs240-1G     0 Apr 11 12:57 tail0.in
+-rw-r--r-- 1 janwesh cs240-1G   145 Apr 11 12:57 tail1.in
+-rw-r--r-- 1 janwesh cs240-1G   126 Apr 11 13:03 tail1.out
+-rw-r--r-- 1 janwesh cs240-1G   198 Apr 11 12:57 tail2.in
+-rw-r--r-- 1 janwesh cs240-1G   117 Apr 11 13:03 tail2.out
+-rw-r--r-- 1 janwesh cs240-1G   219 Apr 11 12:57 tail3.in
+-rw-r--r-- 1 janwesh cs240-1G   447 Apr 11 12:57 tail4.in
+-rw-r--r-- 1 janwesh cs240-1G   347 Apr 11 13:05 tail4.out
+-rw-r--r-- 1 janwesh cs240-1G   955 Apr  7 17:09 tail.c
+-rw-r--r-- 1 janwesh cs240-1G  3256 Apr 11 13:01 tail.o
+-rw-r--r-- 1 janwesh cs240-1G     0 Apr 11 13:09 typescript1
+-rw-r--r-- 1 janwesh cs240-1G  8529 Apr 11 13:06 typescript2
+janwesh@vm71:~/cs240/hw5$ cat explore.c
+/* explore.c: program to explore memory locations via pointers
+   bob wilson
+   03/13/2003
+   modified by Ron Cheung 7/8/2003
+   */
+
+
+/*
+	Name: Anwesh Joshi
+	explore.c - Homework5
+	Date: 04/10/2017 
+*/
+
+
+#include <stdio.h>
+
+int a = 0x13579753;
+static int b = 0x24680864;
+
+void foobar(int, int, int *, int *);
+
+int main(void)
+{
+	static int c = 0xaaaa5555;
+	int d = 0x5555aaaa;
+	int *ap = &a;
+	int *bp = &b;
+	int *cp = &c;
+	int *dp = &d;
+	int array[1] = {0x01010101};
+
+/* add code here to print the address of array[0]  */
+            
+       printf("address of array[0] = %p\n",&array[0]);
+       
+
+/* add code here to print the variables a, b, c, d and pointers  */
+        printf("a = %x, b = %x, c = %x, d = %x\n",a,b,c,d);
+        printf("ap = %p, bp = %p, cp = %p, dp = %p\n",ap,bp,cp,dp);
+
+
+/* add code here to print array[i] for i = 0 to high enough value */
+       int i = 0;
+       for (i = 0; i < 6; i++) {
+          printf("address:%p, array[%d], value: %x\n",&array[i],i,array[i]);
+       }	
+
+
+
+/* call subroutine foobar and pass arguments  */
+	foobar(a, d, &a, &d);
+
+	return;
+}
+
+void foobar(int x, int y, int *xp, int *yp)
+{
+	int array[1] = {0x10101010};
+	
+	printf("Entering foobar\n");
+
+/* add code here to print address of array[0]  */
+        printf("auto variable array = %p\n",&array[0]);
+
+
+/* add code here to print array[i] for i = 0 to high enough value */
+        int i;
+        for (i = 0; i < 40; i++)
+	    printf("address:%p, array[%d], value: %x\n",&array[i],i,array[i]);
+	return;
+}
+
+janwesh@vm71:~/cs240/hw5$ gcc -m32 explore.c -o explore
+janwesh@vm71:~/cs240/hw5$ ./explore
+address of array[0] = 0xffe401f8
+a = 13579753, b = 24680864, c = aaaa5555, d = 5555aaaa
+ap = 0x804a024, bp = 0x804a028, cp = 0x804a02c, dp = 0xffe401f4
+address:0xffe401f8, array[0], value: 1010101
+address:0xffe401fc, array[1], value: 1
+address:0xffe40200, array[2], value: 804a024
+address:0xffe40204, array[3], value: 804a028
+address:0xffe40208, array[4], value: 804a02c
+address:0xffe4020c, array[5], value: ffe401f4
+Entering foobar
+auto variable array = 0xffe401b8
+address:0xffe401b8, array[0], value: 10101010
+address:0xffe401bc, array[1], value: 1
+address:0xffe401c0, array[2], value: ffe401f8
+address:0xffe401c4, array[3], value: f77a8938
+address:0xffe401c8, array[4], value: ffe40218
+address:0xffe401cc, array[5], value: 804856c
+address:0xffe401d0, array[6], value: 13579753
+address:0xffe401d4, array[7], value: 5555aaaa
+address:0xffe401d8, array[8], value: 804a024
+address:0xffe401dc, array[9], value: ffe401f4
+address:0xffe401e0, array[10], value: ffe401f4
+address:0xffe401e4, array[11], value: 2f
+address:0xffe401e8, array[12], value: 804a000
+address:0xffe401ec, array[13], value: 8048642
+address:0xffe401f0, array[14], value: 1
+address:0xffe401f4, array[15], value: 5555aaaa
+address:0xffe401f8, array[16], value: 1010101
+address:0xffe401fc, array[17], value: 6
+address:0xffe40200, array[18], value: 804a024
+address:0xffe40204, array[19], value: 804a028
+address:0xffe40208, array[20], value: 804a02c
+address:0xffe4020c, array[21], value: ffe401f4
+address:0xffe40210, array[22], value: 80485f0
+address:0xffe40214, array[23], value: f7773000
+address:0xffe40218, array[24], value: 0
+address:0xffe4021c, array[25], value: f75e5ad3
+address:0xffe40220, array[26], value: 1
+address:0xffe40224, array[27], value: ffe402b4
+address:0xffe40228, array[28], value: ffe402bc
+address:0xffe4022c, array[29], value: f7795cca
+address:0xffe40230, array[30], value: 1
+address:0xffe40234, array[31], value: ffe402b4
+address:0xffe40238, array[32], value: ffe40254
+address:0xffe4023c, array[33], value: 804a018
+address:0xffe40240, array[34], value: 804822c
+address:0xffe40244, array[35], value: f7773000
+address:0xffe40248, array[36], value: 0
+address:0xffe4024c, array[37], value: 0
+address:0xffe40250, array[38], value: 0
+address:0xffe40254, array[39], value: c800ef21
+janwesh@vm71:~/cs240/hw5$ cat memo.txt
+
+Name: Anwesh Joshi
+Date: 04/10/2017
+memo.txt - Homework 5
+
+explore.c:
+The local automatic variable d is stored in a stack and so it has a
+different memory address compared to a,b and c which are external and
+static variables as static and external variables are stored in BSS.
+In the run, we can see local variable's address beginning with ff 
+while all other variables have address beginning with 80. 
+
+Similarly, when priniting the address of array from 0 to 6, we see the
+value of external and static variables being printed again. Also, when 
+we check the memory location, it is quite visible that since array is made
+of int, each index increaes by 4 bytes.
+
+Now, when we enter foobar.c, at many points we can see the same value being 
+repeated. We also see the value of d and a being printed as well.
+But it also prints the value of ap and dp as well. This is because of the way
+foobar has been called by passing these values as paraeters.
+
+
+At the end it is quite clear that main() is passed into the stack followed by
+the foobar() making it possible for us to access the local variables.
+janwesh@vm71:~/cs240/hw5$ exit
+exit
+
+Script done on Tue 11 Apr 2017 01:11:02 PM EDT

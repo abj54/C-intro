@@ -1,0 +1,349 @@
+Script started on Tue 11 Apr 2017 01:00:33 PM EDT
+janwesh@vm71:~/cs240/hw5$ ls -l
+total 78
+-rwxr-xr-x 1 janwesh cs240-1G  7434 Apr  4 23:53 explore
+-rw-r--r-- 1 janwesh cs240-1G  1509 Apr  4 23:55 explore.c
+lrwxrwxrwx 1 janwesh cs240-1G    36 Mar 23 11:05 hw5 -> /courses/cs240/s17/xiaohui/GROUP/hw5
+-rw-r--r-- 1 janwesh cs240-1G 37376 Mar 23 11:05 hw5.doc
+-rw-r--r-- 1 janwesh cs240-1G  2033 Apr  7 17:09 lineholder.c
+-rw-r--r-- 1 janwesh cs240-1G   611 Apr  7 17:05 lineholder.h
+-rw-r--r-- 1 janwesh cs240-1G   336 Apr  4 22:31 makefile
+-rw-r--r-- 1 janwesh cs240-1G  1096 Apr  4 23:51 memo.txt
+-rw-r--r-- 1 janwesh cs240-1G  1060 Mar 23 11:05 sample_typescript.txt
+-rwxr-xr-x 1 janwesh cs240-1G  9833 Apr  7 17:10 tail
+-rw-r--r-- 1 janwesh cs240-1G     0 Apr 11 12:57 tail0.in
+-rw-r--r-- 1 janwesh cs240-1G   145 Apr 11 12:57 tail1.in
+-rw-r--r-- 1 janwesh cs240-1G   198 Apr 11 12:57 tail2.in
+-rw-r--r-- 1 janwesh cs240-1G   219 Apr 11 12:57 tail3.in
+-rw-r--r-- 1 janwesh cs240-1G   447 Apr 11 12:57 tail4.in
+-rw-r--r-- 1 janwesh cs240-1G   955 Apr  7 17:09 tail.c
+-rw-r--r-- 1 janwesh cs240-1G  6481 Apr  4 23:53 typescript1
+-rw-r--r-- 1 janwesh cs240-1G     0 Apr 11 13:00 typescript2
+janwesh@vm71:~/cs240/hw5$ cat tail.c
+/*
+	Name: Anwesh Joshi
+	tail.c - Homework5
+	Date: 04/10/2017
+*/
+
+/*
+	Pseudocode:
+	find the command line input using the pointer argv
+        call the init_lineholder  using command line number
+	while there is a next line
+ 		store the line by calling insert_line
+	Call print_lines to print the desired number of lines	
+*/
+#include <stdio.h>
+#include "lineholder.h"
+
+int ggetline(char s[],int lim) // gets a line and returns its length
+{
+   	int c,i;
+   	for (i=0; i<lim-1 && (c=getchar())!=EOF && c!='\n';++i)
+      		s[i]=c;
+   	if (c=='\n') {
+      		s[i]=c;
+      		++i;
+   	}
+   	s[i]='\0';
+   	return i;
+}
+
+
+int main(int argc, char *argv[]) {
+	int nline;
+	char line[MAXLINE];
+	if (argc <= 1) {
+		nline = 10;
+		printf("Wrong input: So nline = 10\n");
+	}
+	else if (argc > 1 && *(argv[1]) == '-') {	
+		nline = atoi(++argv[1]);
+	}
+	init_lineholder(nline);
+	
+	while(ggetline(line,MAXLINE) > 0) {
+		insert_line(line);
+	}
+
+	print_lines();
+	return 1;
+}	
+
+
+
+
+
+janwesh@vm71:~/cs240/hw5$ cat lineholder.c
+/*
+	Name: Anwesh Joshi
+	lineholder.c - Homework 5
+	Date: 04/10/2017
+*/
+/*
+	PseudoCode:
+	init_lineholder(int n):
+		initialize the static variable first, last and end
+		(first will point to 0 to N-1 point in the array pointers,
+  		last will be the total numbers of line to print
+		and end will be total number of lines read)
+
+	insert_line(char * line):
+		allocate memory to the line which is length of line + 1 (for the null character)
+		keep updating first by taking the remainder when it is divided by last( between 0 to last-1) 
+		if end is greater then last
+			free the first slot in the array and set it to NULL
+		first slot in the lines(array) will point to the memory we alocated 
+		increase the counter end
+		use strcopy to copy line to 'a' which is the memory we alocated earlier
+	
+	print_lines():
+		if all the slots in array(lines) are not filled
+			print each one from first to filled
+			free the memory alocated for them
+		if the slots are all filled at least once
+			increment first
+			run the loop n times 
+				print the first slot to the last one
+				free the memory alocated for them and set it to NULL
+				 
+*/
+
+#include <string.h>
+#include "lineholder.h"
+#include <stdio.h> 
+#include <stdlib.h>
+
+
+static char * lines[MAXLEN];
+static int first, last, end;
+
+void init_lineholder(int n) {
+	last = n;
+	first = 0;
+	end = 0;
+	     
+}
+
+void insert_line(char * line) {
+	char *a  = (char *) (malloc((strlen(line))+1));
+	if (a == NULL) {
+		return;
+	}
+	first = end % last;
+	
+	if (end >= last) {
+		free(lines[first]);
+		lines[first] = NULL;
+	}
+	lines[first] = a;
+	++end;
+	
+	strcpy(a,line);
+}
+
+void print_lines() {
+	int i,j;
+	if (end <= last) {
+		printf("%d output lines are:\n",end);
+		for (i = 0; i < end; i++) {
+			printf("%s",lines[i]);	
+	                free(lines[i]);
+       	                lines[i] = NULL;
+		}
+	}
+	
+	else {
+		
+		i = first + 1;
+		printf("%d output lines are:\n",last);
+		for  (j = 0; j < last; j++) {
+			i %= last;
+			printf("%s",lines[i]);
+			free(lines[i]);
+			lines[i] = NULL;
+			i++;
+		}	
+	}
+}		 
+
+
+
+janwesh@vm71:~/cs240/hw5$ cat lineholder.h
+/*
+	Name: Anwesh Joshi
+	lineholder.h - Homework5
+	Date: 04/10/2017
+*/
+
+
+# define MAXLINE 1000 // Maximum lines that can be hold
+# define MAXLEN 2000  // Maximum length of individual line
+
+void init_lineholder(int);  // Starts the lineholder by initializing
+                            // required variables
+
+void insert_line(char *);   // Adds line to the array of pointers 
+			    // by allocating memory for new line and
+                            // freeing it when no longer needed 
+
+void print_lines(void);     // Print the lines in the array and frees
+                            // memory used for them
+janwesh@vm71:~/cs240/hw5$ cat makefile
+
+
+# Name: Anwesh Joshi
+# makefile - tail.c [HW 5]
+# Date: 04/11/2017
+
+
+
+cc =	gcc
+CFLAGS =   -m32 
+
+tail:		tail.o lineholder.o 
+		$(cc) $(CFLAGS) -g  -o tail tail.o lineholder.o
+
+
+
+tail.o:  	tail.c lineholder.h
+		$(cc) $(CFLAGS) -g -c  tail.c
+lineholder.o:	lineholder.c lineholder.h
+		$(cc) $(CFLAGS) -g -c lineholder.c
+
+clean:
+		rm *.o
+janwesh@vm71:~/cs240/hw5$ make
+gcc -m32  -g -c  tail.c
+gcc -m32  -g -c lineholder.c
+gcc -m32  -g  -o tail tail.o lineholder.o
+janwesh@vm71:~/cs240/hw5$ cat tail0.in
+janwesh@vm71:~/cs240/hw5$ ./tail -5<tail0.in
+0 output lines are:
+janwesh@vm71:~/cs240/hw5$ cat tail1.in
+1. Now is the time
+2. for all good men
+3. to come to the
+4. aid of their country.
+5. Now is the time
+6. for all good men
+7. (less than 10 lines)
+janwesh@vm71:~/cs240/hw5$ ./tail -5<tail1.in>tail1.out
+janwesh@vm71:~/cs240/hw5$ cat tail1.out
+5 output lines are:
+3. to come to the
+4. aid of their country.
+5. Now is the time
+6. for all good men
+7. (less than 10 lines)
+janwesh@vm71:~/cs240/hw5$ cat tail2.in
+1. Now is the time
+2. for all good men
+3. to come to the
+4. aid of their country.
+5. Now is the time
+6. for all good men
+7. to come to the
+8. aid of their country.
+9. Now is the time
+10. (10 lines)
+janwesh@vm71:~/cs240/hw5$ ./tail -5 <tail2.in>tail2.out
+janwesh@vm71:~/cs240/hw5$ cat tail2.out
+5 output lines are:
+6. for all good men
+7. to come to the
+8. aid of their country.
+9. Now is the time
+10. (10 lines)
+janwesh@vm71:~/cs240/hw5$ cat tail3.in
+1. Now is the time
+2. for all good men
+3. to come to the
+4. aid of their country.
+5. Now is the time
+6. for all good men
+7. to come to the
+8. aid of their country.
+9. Now is the time
+10. for all good men
+11. (11 lines)
+janwesh@vm71:~/cs240/hw5$ ./tail <tail3.in
+Wrong input: So nline = 10
+10 output lines are:
+2. for all good men
+3. to come to the
+4. aid of their country.
+5. Now is the time
+6. for all good men
+7. to come to the
+8. aid of their country.
+9. Now is the time
+10. for all good men
+11. (11 lines)
+janwesh@vm71:~/cs240/hw5$ cat tail4.in
+1. Now is the time
+2. for all good men
+3. to come to the
+4. aid of their country.
+5. Now is the time
+6. for all good men
+7. to come to the
+8. aid of their country.
+9. Now is the time
+10. for all good men
+11. to come to the
+12. aid of their country.
+13. Now is the time
+14. for all good men
+15. to come to the
+16. aid of their country.
+17. Now is the time
+18. for all good men
+19. to come to the
+20. aid of their country.
+21. (twice as many lines)
+janwesh@vm71:~/cs240/hw5$ ./tail -15 <tail4.in>tail4.out
+janwesh@vm71:~/cs240/hw5$ cat tail4.out
+15 output lines are:
+7. to come to the
+8. aid of their country.
+9. Now is the time
+10. for all good men
+11. to come to the
+12. aid of their country.
+13. Now is the time
+14. for all good men
+15. to come to the
+16. aid of their country.
+17. Now is the time
+18. for all good men
+19. to come to the
+20. aid of their country.
+21. (twice as many lines)
+janwesh@vm71:~/cs240/hw5$ ./tail -3
+i
+am
+a
+student
+of
+cs
+240
+3 output lines are:
+of
+cs
+240
+janwesh@vm71:~/cs240/hw5$ ./tail -10
+when it
+is less
+number of lines
+everything prints
+4 output lines are:
+when it
+is less
+number of lines
+everything prints
+janwesh@vm71:~/cs240/hw5$ exit
+exit
+
+Script done on Tue 11 Apr 2017 01:06:45 PM EDT

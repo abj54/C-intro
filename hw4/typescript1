@@ -1,0 +1,317 @@
+Script started on Wed 22 Mar 2017 03:20:00 PM EDT
+janwesh@vm71:~/cs240/hw4$ ls -l
+total 62
+-rw-r--r-- 1 janwesh cs240-1G   159 Mar 22 15:09 calc.h
+-rw-r--r-- 1 janwesh cs240-1G    34 Mar 22 14:33 calc.in
+-rwxr-xr-x 1 janwesh cs240-1G  7802 Mar 22 15:19 calcit
+lrwxrwxrwx 1 janwesh cs240-1G    36 Mar  7 21:51 cs240_hw4 -> /courses/cs240/s17/xiaohui/GROUP/hw4
+-rw-r--r-- 1 janwesh cs240-1G   643 Mar 22 14:21 getch.c
+-rw-r--r-- 1 janwesh cs240-1G  1340 Mar 22 14:32 getch.o
+-rw-r--r-- 1 janwesh cs240-1G   893 Mar 22 14:25 getop.c
+-rw-r--r-- 1 janwesh cs240-1G  1364 Mar 22 15:12 getop.o
+-rw-r--r-- 1 janwesh cs240-1G 34816 Mar 12 18:18 hw4.doc
+-rw-r--r-- 1 janwesh cs240-1G  1187 Mar 22 15:19 main.c
+-rw-r--r-- 1 janwesh cs240-1G  2048 Mar 22 15:19 main.o
+-rw-r--r-- 1 janwesh cs240-1G  1440 Mar 22 15:16 makefile
+-rw-r--r-- 1 janwesh cs240-1G  1292 Mar 22 15:05 makefile2
+-rw-r--r-- 1 janwesh cs240-1G   832 Mar 22 14:21 stack.c
+-rw-r--r-- 1 janwesh cs240-1G  1396 Mar 22 14:32 stack.o
+-rw-r--r-- 1 janwesh cs240-1G     0 Mar 22 15:20 typescript1
+janwesh@vm71:~/cs240/hw4$ cat makefile
+
+#  Name :Anwesh Joshi
+#  makefile - HW4
+#  03/22/2017
+
+
+
+
+
+# makefile for hw4
+# format of entries;
+
+# < target list >:  	< dependency list >
+# 			< command list >
+
+# make will look at the last-write dates of each file, and if the target
+# file hasn't been updated since the source files were last modified,
+# it will update the target file by executing the shell command. Note that
+# the spacing to the < dependency list > and < command list > MUST be done
+# with tabs, not spaces.
+#
+# now here is a Macro as defined in Glass Unix.
+
+cc =	gcc
+CFLAGS =   -m32 
+
+calcit:	main.o getop.o stack.o getch.o
+		$(cc) $(CFLAGS) -g -o calcit main.o getop.o stack.o getch.o
+
+# note that if calc.h changes, main.c and getop.c must be recompiled
+
+
+main.o:	main.c calc.h
+		$(cc) $(CFLAGS) -c -o main.o main.c
+getop.o:	getop.c calc.h
+		$(cc) $(CFLAGS) -c -o getop.o getop.c
+stack.o:	stack.c 
+		$(cc) $(CFLAGS) -c -o stack.o stack.c
+getch.o: 	getch.c 
+		$(cc) $(CFLAGS) -c -o getch.o getch.c
+
+# this tells make what to make if you just type 'make'; if this isn't there,
+# the first rule in the file will be the default.
+
+# default:	calcit
+
+# here is a rule to clean up the directory when calcit is final and you want
+# to reduce the clutter in the listing. Note that clean doesn't need to
+# depend on any file modification time, so the < dependency list > position is
+# just left empty.
+
+clean:
+		rm *.o
+janwesh@vm71:~/cs240/hw4$ cat main.c
+/*
+Name :Anwesh Joshi
+main.c - HW 4
+Date: 03/22/2017
+*/
+
+/*
+ * main.c
+ *
+ * reverse polish calculator
+ */
+/*
+  Added the required bitwise oeprations on the provided code to make sure it works.
+*/
+
+#include <stdio.h>
+#include "calc.h" /* header file */
+#include <math.h>
+#include <stdlib.h>
+
+#define MAXOP 100
+
+main()
+{
+  int type;
+  int op2;
+  char s[MAXOP];
+   
+  while ((type = getop(s)) != EOF) 
+    {
+      switch(type) 
+	{
+	case NUMBER:
+	  push(atoi(s));
+	  break;
+	case '+':
+	  push(pop() + pop());
+	  break;
+	case '*':
+	  push(pop() * pop());
+	  break;
+	case '-':
+	   
+	  op2 = pop();
+	  
+	  push(pop() - op2);
+	  break;
+	case '/':
+	  op2 = pop();
+	  if (op2 != 0)
+	    push(pop() / op2);
+	  else 
+	    {
+	      printf("error : zero divisor\n");
+	      exit(1);
+	    }
+	  break;
+	case '^':
+          push(pop() ^ pop());
+	  break;
+	case '%':
+	  op2 = pop();
+	  if (op2 != 0)
+		push(pop() % op2);
+		
+	  else {
+		printf("remainder when divided by zero\n"); 
+		exit(1);
+	  }
+	  break;
+	case '~':
+           push(~pop());
+           break;			
+	case '\n':
+	  printf("The answer is %d.\n", pop());
+	  break;
+	default:
+	  printf("error: unknown command %s\n", s);
+	  exit(1);
+	}
+    }
+}
+janwesh@vm71:~/cs240/hw4$ cat getop.c
+/*
+ Anwesh Joshi
+ getop.c - HW4
+ 03/22/2017
+*/
+
+/* 
+ * getop.c
+ *
+ * gets next token: operator or numeric operand
+                  : if it's a negative sign, make sure to check for  it as negative number of '-' operation
+ */
+
+#include <stdio.h>
+#include <ctype.h>
+#include "calc.h"
+
+int getop(char s[])
+{
+    int i, c;
+
+    while ((s[0] = c = getch()) == ' ' || c == '\t')
+	;
+
+    s[1] = '\0';
+
+    if (!isdigit(c) && c!='-' )
+      return c;  /* not a number */
+
+    /* collect integer part in string s */
+    i = 0;
+ 
+   if(c=='-')
+          if(isdigit(c=getch()))
+              s[++i]=c;
+          else
+          {
+             if(c!=EOF)
+                  ungetch(c);
+             return '-';
+          }       
+ 
+  
+      if (isdigit(c))
+            while (isdigit(s[++i] = c = getch()))
+               ;
+
+    s[i] = '\0';
+    if (c != EOF)
+      ungetch(c);
+    
+    return NUMBER;
+}
+
+
+janwesh@vm71:~/cs240/hw4$ cat getch.c
+/*
+ Anwesh Joshi
+ getch.c - HW4
+ 03/22/2017
+*/
+/*
+ * getch.c
+ *
+ * getch  returns one  character from stdin 
+ * or from the buffer buf if it is not empty
+ * ungetch puts one character in the buffer buf 
+ */
+
+#include <stdio.h>
+#define BUFSIZE 100
+
+char buf[BUFSIZE];        /* buffer for ungetch */
+int  bufp = 0;            /* next free position in buf */
+
+int getch(void)           /* get a (possibly pushed back) character */
+{
+    return(bufp > 0) ? buf[--bufp] : getchar();
+}
+
+void ungetch(int c)        /* push character back on input */
+{
+    if (bufp >= BUFSIZE)
+	printf("ungetch: too many character \n");
+    else
+	buf[bufp++] = c;
+}
+janwesh@vm71:~/cs240/hw4$ cat stack.c
+/*
+ Name : Anwesh Joshi
+ stack.c - HW4
+ Date: 03/22/2017
+*/
+
+/*
+ * stack.c
+ *
+ * stack routines
+ */
+/*
+  Push: Push number in the stack
+  Pop: Pop the top value of the stack
+*/
+
+#include <stdio.h>
+#include "calc.h"
+#define MAXVAL 100  /* maximum depth of val stack */
+
+/* even better, we could make the following two defines "static"
+   and thus hide these data structures from the rest of the sources */
+static int sp = 0;         /* next free stack position */
+static int val[MAXVAL]; /* value stack */
+
+
+/* push: push f onto value stack */
+void push(int f)
+{
+    if (sp < MAXVAL)
+	val[sp++] = f;
+    else
+	printf("error: stack full, can't push %d\n", f);
+}
+
+/* pop: pop and return top value from stack */
+
+int pop(void)
+{
+    if (sp > 0)
+	return val[--sp];
+    else
+      {
+	printf("error: stack empty\n");
+	return 0;
+      }
+}
+
+janwesh@vm71:~/cs240/hw4$ cat calc.h
+/* 
+Name: Anwesh Joshi
+calc.h - hw4
+03/22/2017   
+*/
+#define NUMBER '0'
+
+void push(int);
+int pop(void);
+int getop(char[]);
+int getch(void);
+void ungetch(int);
+janwesh@vm71:~/cs240/hw4$ cat calc.in
+292 16 % 292 16 / 16  * + 292 ^ ~
+janwesh@vm71:~/cs240/hw4$ make
+gcc -m32  -c -o main.o main.c
+gcc -m32  -g -o calcit main.o getop.o stack.o getch.o
+janwesh@vm71:~/cs240/hw4$ ./calcit < calc.in
+The answer is -1.
+janwesh@vm71:~/cs240/hw4$ exit
+exit
+
+Script done on Wed 22 Mar 2017 03:22:19 PM EDT

@@ -1,0 +1,28 @@
+Script started on Mon 30 Jan 2017 09:31:32 PM EST
+janwesh@vm71:~/cs240/hw1$ ls -l
+total 49
+lrwxrwxrwx 1 janwesh cs240-1G    36 Jan 24 22:40 cs240_hw1 -> /courses/cs240/s17/xiaohui/GROUP/hw1
+-rwxr-xr-x 1 janwesh cs240-1G  7300 Jan 30 21:29 hello
+-rw-r--r-- 1 janwesh cs240-1G   168 Jan 30 21:30 hello.c
+-rw-r----- 1 janwesh cs240-1G 39430 Jan 24 23:33 hw1.doc
+-rw-r--r-- 1 janwesh cs240-1G     0 Jan 30 21:31 typescript
+janwesh@vm71:~/cs240/hw1$ cat hello.c
+/*hello: first homework assignment
+  name: Anwesh Joshi
+  date: 01/31/2017
+  */
+
+#include <stdio.h>
+
+int main(void)
+{
+      printf("Hello,world!\n");
+      return 0;
+}
+janwesh@vm71:~/cs240/hw1$ gcc -m32 hello.c -o hello
+janwesh@vm71:~/cs240/hw1$ ./hello
+Hello,world!
+janwesh@vm71:~/cs240/hw1$ exit
+exit
+
+Script done on Mon 30 Jan 2017 09:32:17 PM EST

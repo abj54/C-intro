@@ -1,0 +1,15 @@
+#header {
+  text-align: center;
+  padding-top: 10px;
+}
+#main {
+  font-size: 3em;
+}
+#main {
+  font-family: 'Pacifico', cursive;
+}
+hr {
+  border-style: solid;
+  border-color: rgba(0, 0, 0, .1);
+  border-bottom: none;
+}

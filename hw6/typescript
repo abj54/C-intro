@@ -1,0 +1,321 @@
+Script started on Wed 19 Apr 2017 10:47:06 PM EDT
+janwesh@vm71:~/cs240/hw6$ ls -l
+total 47
+-rw-r--r-- 1 janwesh cs240-1G  1458 Apr 12 23:33 gettysburg.txt
+lrwxrwxrwx 1 janwesh cs240-1G    36 Apr 12 23:33 hw_6 -> /courses/cs240/s17/xiaohui/GROUP/hw6
+-rw-r--r-- 1 janwesh cs240-1G 26625 Apr 12 23:33 hw6.doc
+-rw-r--r-- 1 janwesh cs240-1G  2840 Apr 18 10:12 output.txt
+-rw-r--r-- 1 janwesh cs240-1G     0 Apr 19 22:47 typescript
+-rwxr-xr-x 1 janwesh cs240-1G  7925 Apr 19 22:46 wordcounter
+-rw-r--r-- 1 janwesh cs240-1G  2459 Apr 18 16:25 wordcounter1.c
+-rw-r--r-- 1 janwesh cs240-1G  2502 Apr 19 22:45 wordcounter.c
+janwesh@vm71:~/cs240/hw6$ cat wordcounter.c
+/*
+  Name: Anwesh Joshi
+  wordcounter.c - hw6
+  Date: 04/19/17
+*/
+
+/*
+	Pseudocode:
+	
+	main:
+	while there is a word to process
+		a word is beginning with an alphabet
+			insert it to the array of words
+	sort the words on the basis of their frequency
+	print the words
+
+	compare:
+	compare two struct on the basis of their frequence in increasing order
+
+	insert:
+	run a loop in the struct array on all its words
+		if the word is found
+			increase its count
+		 	return
+	allocate memory for the new word in the array 
+	add the new word in the array with frquency 1
+	increase the count for total number of words in the array
+
+	print:
+	run a loop on all the words in the struct array
+		print the word with it's frequency
+		free the memory allocated for it
+
+	getword:
+	get a word from command line input
+
+	getch:
+	getch  returns one  character from stdin  or from the buffer buf if it is not empty
+  	
+	ungetch:
+	ungetch puts one character in the buffer buf 
+	
+
+*/
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+#define NKEYS 5000
+#define BUFSIZE 100
+#define MAXWORD 30
+
+char buf[BUFSIZE];
+int bufp = 0;
+int size = 0;
+
+struct key{
+	char * word;
+	int count;
+} keytab[NKEYS];
+
+int getword(char *word, int lim) {
+	int c, getch(void);
+ 	void ungetch(int);
+ 	char *w = word;
+ 	while (isspace(c = getch()))
+ 		;
+ 	if (c != EOF)
+ 		*w++ = c;
+ 	if (!isalpha(c)) {
+ 		*w = '\0';
+ 		return c;
+ 	}
+ 	for ( ; --lim > 0; w++)
+		if (!isalnum(*w = getch())) {
+ 		ungetch(*w);
+ 		break;
+	 }	
+ 	*w = '\0';
+ 	return word[0];
+}
+
+int getch() {
+	return (bufp > 0) ? buf[--bufp]:getchar();
+}
+
+void ungetch(int c) {
+	if (bufp >= BUFSIZE)
+		printf("ungetch: too many chars\n");
+	else
+		buf[bufp++] = c;
+}
+
+void print() {
+	int i = 0;
+	for ( i = 0; i < size; i++) {
+		printf("%15s\t%3d\n",keytab[i].word,keytab[i].count);
+		free(keytab[i].word);
+		keytab[i].word=NULL;
+	}
+}
+
+void insert(char * newword) {
+	int i = 0;
+	for (i = 0; i < size; i++) {
+		if (strcmp(newword,keytab[i].word)==0) {
+			++keytab[i].count;
+			return;
+		}
+	}
+	keytab[size].word = (char *) malloc(strlen(newword)+1);
+	if (keytab[size].word == NULL) 
+		return;
+	strcpy(keytab[size].word,newword);
+	keytab[size].count = 1;
+	size++;
+	
+}
+int compare(struct key * p,struct key * q){
+	return (p->count-q->count);
+}
+
+int main() {
+	char word[MAXWORD];	
+	while (getword(word,MAXWORD)!=EOF) {
+		if (isalpha(word[0]))
+			insert(word);
+	}
+	qsort(keytab,size,sizeof(struct key),(int(*)(const void *, const void *))compare);
+	print();
+	return 1;
+}
+
+
+janwesh@vm71:~/cs240/hw6$ gcc -m32 wordcounter.c -o wordcounter
+janwesh@vm71:~/cs240/hw6$ cat gettysburg.txt
+Four score and seven years ago our fathers brought forth on this
+continents a new nation, conceived in Liberty, and dedicated to the
+proposition that all men are created equal.  Now we are engaged in a
+great civil war, testing whether that nation or any nation so
+conceived and so dedicated, can long endure. We are met on a great
+battle field of that war. We have come to dedicate a portion of that
+field, as a final resting place for those who here gave their lives
+that that nation might live. It is altogether fitting and proper that
+we should do this.  But, in a larger sense, we can not dedicate we can
+not consecrate  we can not hallow this ground. The brave men, living
+and dead, who struggled here, have consecrated it, far above our poor
+power to add or detract. The world will little note, nor long remember
+what we say here, but it can never forget what they did here. It is
+for us the living, rather, to be dedicated here to the unfinished work
+which they who fought here have thus far so nobly advanced.  It is
+rather for us to be here dedicated to the great task remaining before
+us that from these honored dead we take increased devotion to that
+cause for which they gave the last full measure of devotion that we
+here highly resolve that these dead shall not have died in vain that
+this nation, under God, shall have a new birth of freedom and that
+government of the people, by the people, for the people, shall not
+perish from the earth.
+
+
+janwesh@vm71:~/cs240/hw6$ ./wordcounter < gettysburg.txt >output.txt
+janwesh@vm71:~/cs240/hw6$ cat output.txt
+           Four	  1
+          score	  1
+          seven	  1
+          years	  1
+            ago	  1
+        fathers	  1
+        brought	  1
+          forth	  1
+     continents	  1
+        Liberty	  1
+    proposition	  1
+            all	  1
+        created	  1
+          equal	  1
+            Now	  1
+        engaged	  1
+          civil	  1
+        testing	  1
+        whether	  1
+            any	  1
+         endure	  1
+            met	  1
+         battle	  1
+           come	  1
+        portion	  1
+             as	  1
+          final	  1
+        resting	  1
+          place	  1
+          those	  1
+          their	  1
+          lives	  1
+          might	  1
+           live	  1
+     altogether	  1
+        fitting	  1
+         proper	  1
+         should	  1
+             do	  1
+            But	  1
+         larger	  1
+          sense	  1
+     consecrate	  1
+         hallow	  1
+         ground	  1
+          brave	  1
+      struggled	  1
+    consecrated	  1
+          above	  1
+           poor	  1
+          power	  1
+            add	  1
+        detract	  1
+          world	  1
+           will	  1
+         little	  1
+           note	  1
+            nor	  1
+       remember	  1
+            say	  1
+            but	  1
+          never	  1
+         forget	  1
+            did	  1
+     unfinished	  1
+           work	  1
+         fought	  1
+           thus	  1
+          nobly	  1
+       advanced	  1
+           task	  1
+      remaining	  1
+         before	  1
+        honored	  1
+           take	  1
+      increased	  1
+          cause	  1
+           last	  1
+           full	  1
+        measure	  1
+         highly	  1
+        resolve	  1
+           died	  1
+           vain	  1
+          under	  1
+            God	  1
+          birth	  1
+        freedom	  1
+     government	  1
+             by	  1
+         perish	  1
+          earth	  1
+            our	  2
+             on	  2
+            new	  2
+      conceived	  2
+            men	  2
+            war	  2
+             or	  2
+           long	  2
+             We	  2
+          field	  2
+       dedicate	  2
+           gave	  2
+            The	  2
+         living	  2
+             it	  2
+            far	  2
+           what	  2
+         rather	  2
+             be	  2
+          which	  2
+           from	  2
+          these	  2
+       devotion	  2
+            are	  3
+          great	  3
+             so	  3
+            who	  3
+             It	  3
+             is	  3
+           dead	  3
+           they	  3
+             us	  3
+          shall	  3
+         people	  3
+           this	  4
+             in	  4
+      dedicated	  4
+         nation	  5
+            can	  5
+             of	  5
+           have	  5
+            for	  5
+            not	  5
+            and	  6
+              a	  7
+             to	  8
+             we	  8
+           here	  8
+            the	  9
+           that	 13
+janwesh@vm71:~/cs240/hw6$ exit
+exit
+
+Script done on Wed 19 Apr 2017 10:48:21 PM EDT
